@@ -11,27 +11,34 @@ public class Application {
 
     public static void main(String[] args) {
         Application application = new Application();
+        application.playGame();
     }
 
     public void playGame(){
         int[] randomNumbers = makeThreeRanNum();
+        System.out.println(Arrays.toString(randomNumbers));
         while (true){
-            boolean outCheck = playOneCycle(randomNumbers);
-            // playOneCycle 에서 boolean 을 리턴하는 것이 아니라, 볼카운트를 리턴하도록
-            if(outCheck){
-
+            boolean end = playOneCycle(randomNumbers);
+            if(end){
+                boolean continuous = getContinuous();
+                if(continuous){
+                    randomNumbers = makeThreeRanNum();
+                    continue;
+                }
+                break;
             }
         }
     }
 
+
+
     public boolean playOneCycle(int[] randomNumbers) {
         int[] userNums = getUserNum();
         int[] ballCounts = makeBallCount(randomNumbers, userNums);
-        String string = Arrays.toString(ballCounts);
         System.out.println(Arrays.toString(randomNumbers));
-        System.out.println(string);
-        viewResult(randomNumbers);
-        return checkOut(userNums[0]);
+        System.out.println(Arrays.toString(ballCounts));
+        viewResult(ballCounts);
+        return 0checkOut(ballCounts[0]);
     }
 
     public int makeRandomNum() {
@@ -75,10 +82,20 @@ public class Application {
         return userNums;
     }
 
+    public boolean getContinuous(){
+        String input= Console.readLine();
+        if(!input.equals("1") && !input.equals("2")){
+            System.out.println("잘못된 입력값입니다.");
+            throw new IllegalArgumentException();
+        }
+        return input.equals("1");
+    }
+
     public int[] makeBallCount(int[] randomNums, int[] userNums) {
         int[] ballCount = new int[2];
         for (int i = 0; i < randomNums.length; i++) {
             int strikeCheck = strikeCheck(randomNums[i], userNums[i]);
+
             ballCount[0] += strikeCheck;
             if (strikeCheck != 1) {
                 ballCount[1] += ballCheck(randomNums[i], userNums);
@@ -125,6 +142,9 @@ public class Application {
     public void mergeViews(int[] ballcount){
         viewBall(ballcount[1]);
         viewStrike(ballcount[0]);
+        if(ballcount[0] == 0 && ballcount[1]==0){
+            System.out.println("낫씽");
+        }
     }
 
     public void viewOut() {
@@ -136,6 +156,7 @@ public class Application {
         boolean outCheck = checkOut(ballCount[0]);
         if (outCheck) {
             viewOut();
+            return;
         }
         mergeViews(ballCount);
     }
